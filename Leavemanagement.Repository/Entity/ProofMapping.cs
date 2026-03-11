@@ -14,6 +14,8 @@ namespace Leavemanagement.Repository.Entity
         [ForeignKey("EmployeeId")]
         public int EmployeeId { get; set; }
 
+        public string ProofPhoto { get; set; }
+
         public Employee Employees { get; set; }
 
 

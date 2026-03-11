@@ -25,4 +25,8 @@
     <ProjectReference Include="..\..\Leavemanagement.Service\Leavemanagement.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\" />
+  </ItemGroup>
+
 </Project>
