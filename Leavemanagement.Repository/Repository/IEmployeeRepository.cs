@@ -16,6 +16,11 @@ namespace Leavemanagement.Repository.Repository
 
         Task<ProofMapping> IsImageExsist(string imageName);
 
+        Task AddLeaveRequest(LeaveRequest leaveRequest);
+        Task updateLeavebalcnce(LeaveBalance employee);
 
+        Task<int> existingLeave(int empid,int month,int year);
+
+        Task<LeaveBalance> getemployeeleavebalance(int employeeId);
     }
 }

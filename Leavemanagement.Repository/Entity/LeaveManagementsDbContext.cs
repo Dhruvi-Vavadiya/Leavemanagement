@@ -14,7 +14,9 @@ namespace Leavemanagement.Repository.Entity
 
         public DbSet<Employee> Employees { get; set; }
         public DbSet<ProofMapping> ProofMappings { get; set; }
+        public DbSet<LeaveBalance> leaveBalances { get; set; }
+        public DbSet<LeaveRequest> leaveRequests { get; set; }
 
-       
+
     }
 }

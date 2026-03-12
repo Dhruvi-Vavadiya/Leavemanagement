@@ -18,7 +18,7 @@ namespace Leavemanagement.API.Controllers
         [HttpPost("AddEmployee")]
         public async Task<IActionResult> AddEmployee([FromForm] EmpRequestDTO dto)
         {
-            await _employeeService.AddStudent(dto);
+            await _employeeService.AddEmployee(dto);
             return Ok("Employee Added");
         }
     }

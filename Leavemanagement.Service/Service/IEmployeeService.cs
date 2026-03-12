@@ -7,6 +7,10 @@ namespace Leavemanagement.Service.Service
 {
     public interface IEmployeeService
     {
-        Task AddStudent(EmpRequestDTO empRequestDTO);
+        Task AddEmployee(EmpRequestDTO empRequestDTO);
+
+        Task AddEmployeewithleavebalance(EmpRequestDTO empRequestDTO);
+
+        Task ApplyLeave(LeaveRequestRequestDTO leaveRequestRequestDTO);
     }
 }
