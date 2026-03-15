@@ -46,3 +46,11 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.Run();
+
+
+//SELECT* from Employees;
+//select* from leaveBalances;
+//select* from leaveRequests;
+//select* from proofMappings;
+//select* from roles;
+//select* from usermappings;

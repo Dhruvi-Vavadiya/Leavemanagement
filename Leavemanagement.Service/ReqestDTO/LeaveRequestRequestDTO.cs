@@ -9,7 +9,7 @@ namespace Leavemanagement.Service.ReqestDTO
     public class LeaveRequestRequestDTO
     {
       
-       
+       public int Id { get; set; }
         public int EmployeeId { get; set; }
 
         //public Employee Employees { get; set; }
@@ -17,6 +17,10 @@ namespace Leavemanagement.Service.ReqestDTO
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
+
+        public string Resoan { get; set; }
+
+       
 
        
 

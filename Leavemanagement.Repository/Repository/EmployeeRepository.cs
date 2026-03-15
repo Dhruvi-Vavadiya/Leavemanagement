@@ -25,25 +25,18 @@ namespace Leavemanagement.Repository.Repository
 
         public async Task updateLeavebalcnce(LeaveBalance employee)
         {
-            var balance = await _context.leaveBalances
-   .FirstOrDefaultAsync(x => x.EmployeeId == employee.EmployeeId);
+   //         var balance = await _context.leaveBalances
+   //.FirstOrDefaultAsync(x => x.EmployeeId == employee.EmployeeId);
 
-            if (balance.UsedLeaveCount >= balance.TotalLeaveCount)
-            {
-                throw new Exception("Annual leave limit reached");
-            }
+   //         if (balance.UsedLeaveCount >= balance.TotalLeaveCount)
+   //         {
+   //             throw new Exception("Annual leave limit reached");
+   //         }
             _context.leaveBalances.Update(employee);
             await _context.SaveChangesAsync();
             //throw new NotImplementedException();
         }
 
-        public async Task AddLeaveRequest(LeaveRequest leaveRequest)
-        {
-            
-            await _context.leaveRequests.AddAsync(leaveRequest);
-            await _context.SaveChangesAsync();
-            //throw new NotImplementedException();
-        }
 
         public async Task DeleteProofMapping(ProofMapping proofMapping)
         {
@@ -90,6 +83,26 @@ namespace Leavemanagement.Repository.Repository
         {
              _context.Employees.Update(employee);
             await _context.SaveChangesAsync();
+            //throw new NotImplementedException();
+        }
+        public async Task AddLeaveRequest(LeaveRequest leaveRequest)
+        {
+            
+            await _context.leaveRequests.AddAsync(leaveRequest);
+            await _context.SaveChangesAsync();
+            //throw new NotImplementedException();
+        }
+
+        public async Task UpdateLeaveRequest(LeaveRequest leaveRequest)
+        {
+            _context.leaveRequests.Update(leaveRequest);
+            await _context.SaveChangesAsync();
+            //throw new NotImplementedException();
+        }
+
+        public async Task<LeaveRequest> GetLeaveRequestsByEmployeeId(int leaverequestId)
+        {
+            return await _context.leaveRequests.FirstOrDefaultAsync(s => s.Id == leaverequestId);
             //throw new NotImplementedException();
         }
     }

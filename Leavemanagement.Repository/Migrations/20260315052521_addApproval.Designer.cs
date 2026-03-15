@@ -4,6 +4,7 @@ using Leavemanagement.Repository.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Leavemanagement.Repository.Migrations
 {
     [DbContext(typeof(LeaveManagementsDbContext))]
-    partial class LeaveManagementsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260315052521_addApproval")]
+    partial class addApproval
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,10 +73,10 @@ namespace Leavemanagement.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("AdminApprovalDate")
+                    b.Property<DateTime>("AdminApprovalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("AdminId")
+                    b.Property<int>("AdminId")
                         .HasColumnType("int");
 
                     b.Property<int>("EmployeeId")
@@ -82,16 +85,16 @@ namespace Leavemanagement.Repository.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HRId")
+                    b.Property<int>("HRId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("HRapprovalDate")
+                    b.Property<DateTime>("HRapprovalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ManagerId")
+                    b.Property<int>("ManagerId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ManagerapprovalDate")
+                    b.Property<DateTime>("ManagerapprovalDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Resoan")
@@ -201,7 +204,8 @@ namespace Leavemanagement.Repository.Migrations
                     b.HasOne("Leavemanagement.Repository.Entity.Employee", "Admins")
                         .WithMany("leaveRequestsAdmin")
                         .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Leavemanagement.Repository.Entity.Employee", "Employees")
                         .WithMany("leaveRequestsEmployee")
@@ -212,12 +216,14 @@ namespace Leavemanagement.Repository.Migrations
                     b.HasOne("Leavemanagement.Repository.Entity.Employee", "HRs")
                         .WithMany("leaveRequestsHr")
                         .HasForeignKey("HRId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Leavemanagement.Repository.Entity.Employee", "Managers")
                         .WithMany("leaveRequestsManager")
                         .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Admins");
 

@@ -22,6 +22,29 @@ namespace Leavemanagement.Repository.Entity
 
         public int TotalLeaveDays { get; set; }
 
-        public string Status { get; set; } = "Pending";
+        public string Resoan { get; set; }
+
+        public int RoleId { get; set; }
+
+        public DateTime? ManagerapprovalDate { get; set; }
+
+        [ForeignKey("ManagerId")]
+        public int? ManagerId { get; set; } //1
+        public Employee Managers { get; set; }
+
+
+        public DateTime? HRapprovalDate { get; set; }
+
+        [ForeignKey("HRId")]
+        public int? HRId { get; set; } //2
+        public Employee HRs { get; set; }    
+
+        public DateTime? AdminApprovalDate { get; set; }
+
+        [ForeignKey("AdminId")]
+        public int? AdminId { get; set; } //3
+        public Employee Admins { get; set; }
+
+        public int Status { get; set; }
     }
 }

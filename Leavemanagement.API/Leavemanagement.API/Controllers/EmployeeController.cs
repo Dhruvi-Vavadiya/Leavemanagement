@@ -44,7 +44,14 @@ namespace Leavemanagement.API.Controllers
         public async Task<IActionResult> ApplyLeave([FromForm] LeaveRequestRequestDTO dto)
         {
             await _employeeService.ApplyLeave(dto);
-            return Ok("Employee Added");
+            return Ok("leave Added");
+        }
+
+        [HttpPost("UpdateLeave")]
+        public async Task<IActionResult> UpdateLeave([FromForm] LeaveapprovedRequestDTO dto)
+        {
+            await _employeeService.UpdateLeave(dto);
+            return Ok("UpdateLeave");
         }
     }
 }

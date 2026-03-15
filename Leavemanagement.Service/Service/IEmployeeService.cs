@@ -12,5 +12,8 @@ namespace Leavemanagement.Service.Service
         Task AddEmployeewithleavebalance(EmpRequestDTO empRequestDTO);
 
         Task ApplyLeave(LeaveRequestRequestDTO leaveRequestRequestDTO);
+
+        Task UpdateLeave(LeaveapprovedRequestDTO leaveRequestRequestDTO);
+
     }
 }

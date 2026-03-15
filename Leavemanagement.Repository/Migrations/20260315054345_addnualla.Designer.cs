@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Leavemanagement.Repository.Migrations
 {
     [DbContext(typeof(LeaveManagementsDbContext))]
-    [Migration("20260312172139_addleavebalanceandrequesttable")]
-    partial class addleavebalanceandrequesttable
+    [Migration("20260315054345_addnualla")]
+    partial class addnualla
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,25 +73,55 @@ namespace Leavemanagement.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("AdminApprovalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("int");
+
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("HRId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("HRapprovalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ManagerapprovalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Resoan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("TotalLeaveDays")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AdminId");
+
                     b.HasIndex("EmployeeId");
+
+                    b.HasIndex("HRId");
+
+                    b.HasIndex("ManagerId");
 
                     b.ToTable("leaveRequests");
                 });
@@ -118,10 +148,50 @@ namespace Leavemanagement.Repository.Migrations
                     b.ToTable("ProofMappings");
                 });
 
+            modelBuilder.Entity("Leavemanagement.Repository.Entity.Roles", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Leavemanagement.Repository.Entity.UserMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserMappings");
+                });
+
             modelBuilder.Entity("Leavemanagement.Repository.Entity.LeaveBalance", b =>
                 {
                     b.HasOne("Leavemanagement.Repository.Entity.Employee", "Employees")
-                        .WithMany()
+                        .WithMany("leaveBalances")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -131,13 +201,34 @@ namespace Leavemanagement.Repository.Migrations
 
             modelBuilder.Entity("Leavemanagement.Repository.Entity.LeaveRequest", b =>
                 {
+                    b.HasOne("Leavemanagement.Repository.Entity.Employee", "Admins")
+                        .WithMany("leaveRequestsAdmin")
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Leavemanagement.Repository.Entity.Employee", "Employees")
-                        .WithMany()
+                        .WithMany("leaveRequestsEmployee")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Leavemanagement.Repository.Entity.Employee", "HRs")
+                        .WithMany("leaveRequestsHr")
+                        .HasForeignKey("HRId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Leavemanagement.Repository.Entity.Employee", "Managers")
+                        .WithMany("leaveRequestsManager")
+                        .HasForeignKey("ManagerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Admins");
+
                     b.Navigation("Employees");
+
+                    b.Navigation("HRs");
+
+                    b.Navigation("Managers");
                 });
 
             modelBuilder.Entity("Leavemanagement.Repository.Entity.ProofMapping", b =>
@@ -151,9 +242,45 @@ namespace Leavemanagement.Repository.Migrations
                     b.Navigation("Employees");
                 });
 
+            modelBuilder.Entity("Leavemanagement.Repository.Entity.UserMapping", b =>
+                {
+                    b.HasOne("Leavemanagement.Repository.Entity.Employee", "Employee")
+                        .WithMany("userMappings")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leavemanagement.Repository.Entity.Roles", "Role")
+                        .WithMany("userMappings")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Leavemanagement.Repository.Entity.Employee", b =>
                 {
+                    b.Navigation("leaveBalances");
+
+                    b.Navigation("leaveRequestsAdmin");
+
+                    b.Navigation("leaveRequestsEmployee");
+
+                    b.Navigation("leaveRequestsHr");
+
+                    b.Navigation("leaveRequestsManager");
+
                     b.Navigation("proofMappings");
+
+                    b.Navigation("userMappings");
+                });
+
+            modelBuilder.Entity("Leavemanagement.Repository.Entity.Roles", b =>
+                {
+                    b.Navigation("userMappings");
                 });
 #pragma warning restore 612, 618
         }
