@@ -169,7 +169,7 @@ namespace Leavemanagement.Service.Service
 
             var getleaveblance = await _employeeRepository.getemployeeleavebalance(leaveRequestRequestDTO.EmployeeId);
 
-            getleaveblance.UsedLeaveCount = totalDays;
+            getleaveblance.UsedLeaveCount = getleaveblance.UsedLeaveCount + totalDays;
 
             await _employeeRepository.updateLeavebalcnce(getleaveblance);
 
@@ -180,54 +180,150 @@ namespace Leavemanagement.Service.Service
 
         public async Task UpdateLeave(LeaveapprovedRequestDTO leaveRequestRequestDTO)
         {
-            List<string> jwtroles = new List<string> { "Admin", "HR", "Manager", "Employee" };
+            //List<string> jwtroles = new List<string> { "Admin", "HR", "Manager" };
+            //List<string> jwtroles = new List<string> { "Manager" };
+            //List<string> jwtroles = new List<string> { "HR" };
+            List<string> jwtroles = new List<string> { "Admin" };
 
-            List<int> jwtroletoenumid = new List<int>();
+            List<int> jwtroleid = new List<int>();
 
             foreach (var role in jwtroles)
             {
                 // Use a fully-qualified reference to System.Enum to avoid conflict with the project's Enum namespace.
                 if (global::System.Enum.TryParse<RoleEnum>(role, true, out RoleEnum roleEnum))
                 {
-                    jwtroletoenumid.Add((int)roleEnum);
+                    jwtroleid.Add((int)roleEnum);
                 }
             }
+            int nextRole = 0;
 
             var getleavereqest = await _employeeRepository.GetLeaveRequestsByEmployeeId(leaveRequestRequestDTO.Id);
 
             if (getleavereqest == null) throw new Exception("Leave request not found.");
 
-            if (getleavereqest.RoleId == (int)RoleEnum.Defalt)
+            var getleaveblance = await _employeeRepository.getemployeeleavebalance(getleavereqest.EmployeeId);
+            if (getleavereqest.Status == (int)StatusEnum.Rejected)
             {
-                if (jwtroles.Contains(RoleEnum.Manager.ToString()))
-                {
-                    getleavereqest.ManagerapprovalDate = DateTime.UtcNow;
-                    getleavereqest.RoleId = (int)RoleEnum.Manager;
-                    //getleavereqest.ManagerId = leaveRequestRequestDTO.EmployeeId;
-                }
+                nextRole = getleavereqest.RoleId;
+                getleaveblance.UsedLeaveCount = (getleavereqest.EndDate - getleavereqest.StartDate).Days + 1;
             }
-            else if (getleavereqest.RoleId == (int)RoleEnum.Manager)
+            else
             {
-                if (jwtroles.Contains(RoleEnum.HR.ToString()))
-                {
-                    getleavereqest.HRapprovalDate = DateTime.UtcNow;
-                    getleavereqest.RoleId = (int)RoleEnum.HR;
-                    //getleavereqest.HRId = leaveRequestRequestDTO.EmployeeId;
-                }
+                nextRole = getleavereqest.RoleId + 1;
             }
-            else if (getleavereqest.RoleId == (int)RoleEnum.HR)
+            //status
+            bool isRejected = false;
+            if (leaveRequestRequestDTO.isApproved)
             {
-                if (jwtroles.Contains(RoleEnum.Admin.ToString()))
-                {
-                    getleavereqest.AdminApprovalDate = DateTime.UtcNow;
-                    getleavereqest.RoleId = (int)RoleEnum.Admin;
-                    //getleavereqest.AdminId = leaveRequestRequestDTO.EmployeeId;
-                }
-
+                getleavereqest.Status = (int)StatusEnum.Approved;
+            }
+            else
+            {
+                isRejected = true;
+                getleavereqest.Status = (int)StatusEnum.Rejected;
+                getleavereqest.Resoan = leaveRequestRequestDTO.Reject_Reason;
             }
 
+            //role
+
+
+            if (jwtroleid.Contains(nextRole))
+            {
+                getleavereqest.RoleId = nextRole;
+
+                if (nextRole == (int)RoleEnum.Manager)
+                {
+                    if (!isRejected)
+                    {
+                        getleavereqest.ManagerapprovalDate = DateTime.UtcNow;
+                        getleavereqest.ManagerId = nextRole; //jwt useid
+                        //send email to all hr for approval
+                        Console.WriteLine("send email to all hr for approval");
+                    }
+
+                }
+                else if (nextRole == (int)RoleEnum.HR)
+                {
+                    if (!isRejected)
+                    {
+                        getleavereqest.HRapprovalDate = DateTime.UtcNow;
+                        getleavereqest.HRId = nextRole;//jwt useid
+                        //send email to all admin for approval
+                        Console.WriteLine("send email to all admin for approval");
+                    }
+                }
+                else if (nextRole == (int)RoleEnum.Admin)
+                {
+                    if (!isRejected)
+                    {
+                        getleavereqest.AdminApprovalDate = DateTime.UtcNow;
+                        getleavereqest.AdminId = nextRole;//jwt useid
+                        //send email to emp for approval
+                        Console.WriteLine("send email to emp for approval");
+                    }
+                }
+                else
+                {
+                    throw new Exception("you are not a part of approval proccess");
+                }
+                if (isRejected)
+                {
+                    //send email to emp for rejection
+                    Console.WriteLine("Email sent to employee for rejection.");
+                }
+            }
+            else
+            {
+                if (getleavereqest.RoleId == (int)RoleEnum.Admin)
+                {
+                    Console.WriteLine("Yor leave is completely confirm");
+                }
+                else
+                    throw new Exception("Your are not aurthority");
+            }
+
+
+            if (isRejected)
+            {
+                getleaveblance.UsedLeaveCount = getleaveblance.UsedLeaveCount - getleavereqest.TotalLeaveDays;
+            }
+
+            //var updatelevaerequest =await CallCommonFunction(jwtroletoenumid,nextRole,getleavereqest);
+
+            //getleavereqest.RoleId = updatelevaerequest.RoleId;
+
+
+            await _employeeRepository.updateLeavebalcnce(getleaveblance);
 
             await _employeeRepository.UpdateLeaveRequest(getleavereqest);
+        }
+
+        private async Task<LeaveRequest> CallCommonFunction(List<int> roles, int nextRole, LeaveRequest upleavereqest)
+        {
+            if (roles.Contains(nextRole))
+            {
+                upleavereqest.RoleId = nextRole;
+
+                if (nextRole == (int)RoleEnum.Manager)
+                {
+                    upleavereqest.ManagerapprovalDate = DateTime.UtcNow;
+                    upleavereqest.ManagerId = nextRole;
+                }
+                else if (nextRole == (int)RoleEnum.HR)
+                {
+                    upleavereqest.HRapprovalDate = DateTime.UtcNow;
+                    upleavereqest.HRId = nextRole;
+                }
+                else if (nextRole == (int)RoleEnum.Admin)
+                {
+                    upleavereqest.AdminApprovalDate = DateTime.UtcNow;
+                    upleavereqest.AdminId = nextRole;
+                }
+            }
+
+            return upleavereqest;
+            // Common logic that needs to be executed before updating the leave request
+            //await Task.Delay(100); // Simulating some asynchronous work
         }
     }
 }

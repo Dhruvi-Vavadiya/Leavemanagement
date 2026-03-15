@@ -51,7 +51,7 @@ namespace Leavemanagement.API.Controllers
         public async Task<IActionResult> UpdateLeave([FromForm] LeaveapprovedRequestDTO dto)
         {
             await _employeeService.UpdateLeave(dto);
-            return Ok("UpdateLeave");
+            return Ok(dto);
         }
     }
 }

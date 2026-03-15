@@ -6,7 +6,7 @@ namespace Leavemanagement.Service.Enum
 {
     public enum RoleEnum
     {
-        Defalt = 10,
+        Defalt = 0,
         Manager = 1,
         HR = 2,
         Admin = 3,
